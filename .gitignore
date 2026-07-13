@@ -1,0 +1,6 @@
+.DS_Store
+__pycache__/
+*.pyc
+.venv/
+sdd-studio/.venv/
+sdd-studio/workspace/

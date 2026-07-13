@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SDD Studio — Spec-Driven Development flow</title>
+  <link rel="stylesheet" href="/web/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap row">
+      <span class="brand"><span class="dot"></span>SDD Studio</span>
+      <div class="controls">
+        <input id="feature" class="feature-in" placeholder="ชื่อฟีเจอร์ (เช่น To-do Task API)" aria-label="ชื่อฟีเจอร์">
+        <div class="seg" role="group" aria-label="เลือก engine">
+          <button id="eng-template" aria-pressed="true">Template</button>
+          <button id="eng-claude" aria-pressed="false">Claude</button>
+        </div>
+        <button id="reset" class="ghost-btn" title="เริ่มใหม่">↺ Reset</button>
+        <button id="theme" class="ghost-btn" title="สลับธีม">◐</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap intro">
+    <span class="eyebrow">Spec-Driven Development · local</span>
+    <h1>สั่งทีละ step แล้วเดินตาม <span class="hl">flow</span> — เห็น Input → Action → Output</h1>
+    <p>กดรันแต่ละคำสั่ง (/constitution → … → /analyze) แล้วดู artifact จริงที่เกิดขึ้น ทุกไฟล์ถูกเขียนลง <span class="mono">workspace/</span></p>
+    <p class="enginenote" id="enginenote">engine: template (offline)</p>
+  </div>
+
+  <main class="wrap"><div class="pipeline" id="pipeline"></div></main>
+
+  <div class="toast" id="toast"></div>
+  <script src="/web/app.js"></script>
+</body>
+</html>

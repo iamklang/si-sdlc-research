@@ -1,0 +1,572 @@
+<title>AI-SDLC: มี framework ไหนชนะหรือยัง?</title>
+<style>
+  :root {
+    --ground:#eaeef1; --surface:#ffffff; --surface-2:#f4f7f8; --surface-3:#eef2f4;
+    --ink:#161e26; --ink-soft:#47535f; --ink-faint:#7a8792;
+    --line:#d7dee3; --line-strong:#c1cad1;
+    --accent:#12717e; --accent-ink:#0a5560; --accent-soft:#dcecee;
+    --amber:#a06f0c; --amber-soft:#f4ead2; --amber-line:#e3c98a;
+    --green:#3a8a5b; --green-soft:#dcefe2;
+    --red:#b0463c; --red-soft:#f3ddd9;
+    --font-sans:system-ui,-apple-system,"Segoe UI","Noto Sans Thai","Thonburi",Roboto,sans-serif;
+    --font-mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --maxw:820px;
+    --shadow:0 1px 2px rgba(16,30,40,.04),0 4px 16px rgba(16,30,40,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ground:#0c1015; --surface:#141b22; --surface-2:#1a222b; --surface-3:#212b35;
+      --ink:#e6edf3; --ink-soft:#a5b2be; --ink-faint:#6c7a88;
+      --line:#26313c; --line-strong:#354250;
+      --accent:#46b4c1; --accent-ink:#7fd0da; --accent-soft:#123037;
+      --amber:#d3a63a; --amber-soft:#2e2611; --amber-line:#4c3f1a;
+      --green:#5cb682; --green-soft:#16301f;
+      --red:#d67a70; --red-soft:#331915;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.28);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#eaeef1; --surface:#ffffff; --surface-2:#f4f7f8; --surface-3:#eef2f4;
+    --ink:#161e26; --ink-soft:#47535f; --ink-faint:#7a8792;
+    --line:#d7dee3; --line-strong:#c1cad1;
+    --accent:#12717e; --accent-ink:#0a5560; --accent-soft:#dcecee;
+    --amber:#a06f0c; --amber-soft:#f4ead2; --amber-line:#e3c98a;
+    --green:#3a8a5b; --green-soft:#dcefe2;
+    --red:#b0463c; --red-soft:#f3ddd9;
+    --shadow:0 1px 2px rgba(16,30,40,.04),0 4px 16px rgba(16,30,40,.05);
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c1015; --surface:#141b22; --surface-2:#1a222b; --surface-3:#212b35;
+    --ink:#e6edf3; --ink-soft:#a5b2be; --ink-faint:#6c7a88;
+    --line:#26313c; --line-strong:#354250;
+    --accent:#46b4c1; --accent-ink:#7fd0da; --accent-soft:#123037;
+    --amber:#d3a63a; --amber-soft:#2e2611; --amber-line:#4c3f1a;
+    --green:#5cb682; --green-soft:#16301f;
+    --red:#d67a70; --red-soft:#331915;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.28);
+  }
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--font-sans);
+    line-height:1.6;-webkit-font-smoothing:antialiased;font-size:16px;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px;}
+
+  /* ---- shared type ---- */
+  .eyebrow{font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:8px;}
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--accent);opacity:.6;}
+  h1,h2,h3{text-wrap:balance;line-height:1.18;letter-spacing:-.01em;font-weight:750;}
+  h2{font-size:clamp(21px,3.4vw,27px);margin:0 0 4px;}
+  h3{font-size:17px;margin:0 0 6px;}
+  p{margin:0 0 14px;}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent);}
+  a:hover{border-bottom-color:var(--accent);}
+  strong{font-weight:700;color:var(--ink);}
+  .mono{font-family:var(--font-mono);}
+  .lead{font-size:18px;color:var(--ink-soft);}
+
+  /* ---- header ---- */
+  header.hero{background:var(--surface);border-bottom:1px solid var(--line);
+    position:relative;overflow:hidden;}
+  .hero-grid{position:absolute;inset:0;opacity:.5;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:34px 34px;-webkit-mask-image:radial-gradient(120% 80% at 80% 0%,#000,transparent 70%);
+    mask-image:radial-gradient(120% 80% at 80% 0%,#000,transparent 70%);pointer-events:none;}
+  .hero-inner{position:relative;padding:52px 0 44px;}
+  .kicker-row{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center;justify-content:space-between;margin-bottom:26px;}
+  .brandmark{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;color:var(--ink-faint);
+    display:flex;align-items:center;gap:9px;}
+  .brandmark .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);
+    box-shadow:0 0 0 4px var(--accent-soft);}
+  h1{font-size:clamp(30px,6.2vw,50px);margin:0 0 18px;font-weight:800;letter-spacing:-.025em;}
+  h1 .q{color:var(--accent);}
+  .hero p{max-width:60ch;margin-bottom:0;}
+  .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px;}
+  .chip{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.03em;color:var(--ink-soft);
+    background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;
+    display:inline-flex;gap:7px;align-items:center;}
+  .chip b{color:var(--ink);font-weight:700;}
+
+  /* ---- verdict banner ---- */
+  .verdict{margin-top:30px;background:var(--amber-soft);border:1px solid var(--amber-line);
+    border-radius:14px;padding:20px 22px;display:flex;gap:16px;align-items:flex-start;}
+  .verdict .badge{flex:none;font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--amber);background:color-mix(in srgb,var(--amber) 14%,transparent);
+    border:1px solid var(--amber-line);border-radius:7px;padding:6px 9px;margin-top:2px;}
+  .verdict p{margin:0;color:var(--ink);}
+  .verdict b{color:var(--ink);}
+
+  /* ---- sections ---- */
+  section{padding:46px 0;border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+  .sec-head{margin-bottom:26px;}
+  .sec-head .eyebrow{margin-bottom:12px;}
+  .sec-head p{color:var(--ink-soft);max-width:62ch;margin:8px 0 0;}
+  .body-col{max-width:66ch;}
+  .body-col p{color:var(--ink-soft);}
+  .body-col p strong{color:var(--ink);}
+
+  /* ---- radar ---- */
+  .radar-layout{display:grid;grid-template-columns:1fr;gap:28px;align-items:center;}
+  @media(min-width:720px){.radar-layout{grid-template-columns:minmax(0,360px) 1fr;}}
+  .radar-figure{background:var(--surface);border:1px solid var(--line);border-radius:16px;
+    padding:18px;box-shadow:var(--shadow);}
+  .radar-figure svg{width:100%;height:auto;display:block;}
+  .radar-legend{display:flex;flex-direction:column;gap:14px;}
+  .ring-item{display:flex;gap:13px;align-items:flex-start;}
+  .ring-item .rk{flex:none;font-family:var(--font-mono);font-size:10.5px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;padding:4px 8px;border-radius:6px;margin-top:2px;min-width:64px;text-align:center;}
+  .rk.adopt{color:var(--green);background:var(--green-soft);}
+  .rk.trial{color:var(--accent);background:var(--accent-soft);}
+  .rk.assess{color:var(--amber);background:var(--amber-soft);}
+  .rk.hold{color:var(--red);background:var(--red-soft);}
+  .ring-item p{margin:0;font-size:14.5px;color:var(--ink-soft);}
+  .ring-item b{color:var(--ink);}
+
+  /* ---- framework cards ---- */
+  .fw-grid{display:grid;grid-template-columns:1fr;gap:14px;}
+  @media(min-width:640px){.fw-grid{grid-template-columns:1fr 1fr;}}
+  .fw{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:18px 18px 16px;
+    box-shadow:var(--shadow);position:relative;overflow:hidden;}
+  .fw::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--fwc,var(--accent));}
+  .fw .fw-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:9px;}
+  .fw h3{margin:0;font-size:16px;}
+  .fw .tag{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ink-faint);white-space:nowrap;}
+  .fw ul{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px;}
+  .fw li{font-size:13.5px;color:var(--ink-soft);padding-left:15px;position:relative;line-height:1.5;}
+  .fw li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:1px;
+    background:var(--fwc,var(--accent));opacity:.7;}
+  .fw.wide{grid-column:1/-1;}
+
+  /* ---- pipeline stack ---- */
+  .stack{display:flex;flex-direction:column;gap:0;max-width:640px;margin:0 auto;}
+  .layer{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:16px 18px;
+    box-shadow:var(--shadow);position:relative;z-index:1;}
+  .layer .l-label{font-family:var(--font-mono);font-size:10.5px;font-weight:700;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+  .layer h3{font-size:15.5px;margin:0 0 5px;}
+  .layer p{margin:0;font-size:13.5px;color:var(--ink-soft);}
+  .layer .tools{margin-top:9px;display:flex;flex-wrap:wrap;gap:6px;}
+  .tools .t{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);background:var(--surface-2);
+    border:1px solid var(--line);border-radius:5px;padding:3px 8px;}
+  .connector{height:26px;display:flex;justify-content:center;align-items:center;color:var(--ink-faint);}
+  .connector svg{width:16px;height:26px;}
+  .loop-note{text-align:center;font-family:var(--font-mono);font-size:11.5px;color:var(--amber);
+    margin-top:14px;background:var(--amber-soft);border:1px dashed var(--amber-line);border-radius:8px;
+    padding:8px 12px;max-width:640px;margin-left:auto;margin-right:auto;}
+
+  /* ---- versus / two views ---- */
+  .versus{display:grid;grid-template-columns:1fr;gap:14px;}
+  @media(min-width:640px){.versus{grid-template-columns:1fr 1fr;}}
+  .view{border-radius:13px;padding:18px;border:1px solid var(--line);}
+  .view.pro{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 30%,transparent);}
+  .view.con{background:var(--red-soft);border-color:color-mix(in srgb,var(--red) 30%,transparent);}
+  .view .who{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    margin-bottom:9px;display:flex;align-items:center;gap:8px;}
+  .view.pro .who{color:var(--accent-ink);}
+  .view.con .who{color:var(--red);}
+  .view p{margin:0 0 10px;font-size:14px;color:var(--ink);}
+  .view p:last-child{margin-bottom:0;}
+  .view .quote{font-style:italic;color:var(--ink-soft);font-size:13.5px;border-left:2px solid currentColor;padding-left:11px;}
+
+  /* ---- table ---- */
+  .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface);
+    box-shadow:var(--shadow);}
+  table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px;}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top;}
+  thead th{font-family:var(--font-mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ink-faint);background:var(--surface-2);position:sticky;top:0;}
+  tbody tr:last-child td{border-bottom:none;}
+  td b{color:var(--ink);}
+  td.sub{color:var(--ink-soft);}
+  .pill{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    padding:3px 7px;border-radius:5px;white-space:nowrap;}
+  .pill.assess{color:var(--amber);background:var(--amber-soft);}
+  .pill.paper{color:var(--ink-faint);background:var(--surface-3);}
+  .pill.green{color:var(--green);background:var(--green-soft);}
+
+  /* ---- camps ---- */
+  .camps{display:grid;grid-template-columns:1fr;gap:14px;margin-top:6px;}
+  @media(min-width:640px){.camps{grid-template-columns:1fr 1fr;}}
+  .camp{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:18px;box-shadow:var(--shadow);}
+  .camp .cn{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:7px;}
+  .camp h3{font-size:15px;}
+  .camp p{margin:0;font-size:14px;color:var(--ink-soft);}
+
+  /* ---- update / themes ---- */
+  .update-band{background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:24px;margin-top:4px;}
+  .themes{display:grid;grid-template-columns:1fr;gap:12px;margin:18px 0 4px;counter-reset:th;}
+  @media(min-width:560px){.themes{grid-template-columns:1fr 1fr;}}
+  .theme{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);
+    border-radius:11px;padding:14px 15px;}
+  .theme .num{counter-increment:th;flex:none;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--accent);
+    background:var(--accent-soft);border-radius:7px;width:28px;height:28px;display:grid;place-items:center;}
+  .theme .num::before{content:counter(th,decimal-leading-zero);}
+  .theme p{margin:0;font-size:13.5px;color:var(--ink-soft);}
+  .theme b{color:var(--ink);}
+  .pullquote{margin:22px 0 6px;font-size:19px;line-height:1.45;font-weight:600;color:var(--ink);
+    border-left:3px solid var(--amber);padding-left:18px;text-wrap:balance;}
+  .pullquote .attr{display:block;font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.04em;
+    color:var(--ink-faint);margin-top:10px;text-transform:none;}
+
+  /* ---- caveats / lists ---- */
+  .cols{display:grid;grid-template-columns:1fr;gap:22px;}
+  @media(min-width:680px){.cols{grid-template-columns:1fr 1fr;}}
+  .stack-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;}
+  .stack-list li{font-size:14px;color:var(--ink-soft);padding-left:20px;position:relative;line-height:1.55;}
+  .stack-list li::before{content:"→";position:absolute;left:0;color:var(--accent);font-family:var(--font-mono);}
+  .refuted li::before{content:"✕";color:var(--red);}
+  .refuted li{color:var(--ink-soft);}
+  .box{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:18px 20px;box-shadow:var(--shadow);}
+  .box h3{font-size:14px;font-family:var(--font-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px;}
+
+  /* ---- footer ---- */
+  footer{padding:38px 0 46px;color:var(--ink-faint);}
+  footer .src{font-size:13px;display:flex;flex-direction:column;gap:6px;margin-top:14px;}
+  footer .src a{color:var(--ink-soft);font-family:var(--font-mono);font-size:12px;word-break:break-all;}
+  .method{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);letter-spacing:.02em;
+    border-top:1px solid var(--line);padding-top:18px;margin-top:22px;line-height:1.7;}
+
+  @media (prefers-reduced-motion:no-preference){
+    .reveal{opacity:0;transform:translateY(10px);animation:rise .6s cubic-bezier(.2,.7,.3,1) forwards;}
+    @keyframes rise{to{opacity:1;transform:none;}}
+    .blip{animation:ping 2.6s ease-out infinite;}
+    @keyframes ping{0%{r:3.5}50%{r:5}100%{r:3.5}}
+  }
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px;}
+</style>
+
+<header class="hero">
+  <div class="hero-grid" aria-hidden="true"></div>
+  <div class="wrap hero-inner">
+    <div class="kicker-row">
+      <span class="brandmark"><span class="dot"></span>AI-SDLC · FIELD BRIEFING</span>
+      <span class="brandmark">2026-07-12</span>
+    </div>
+    <span class="eyebrow">Framework Convergence Report</span>
+    <h1>AI-SDLC: มี framework ไหน<br><span class="q">ชนะเป็นมาตรฐานแล้ว</span>หรือยัง?</h1>
+    <p class="lead">สำรวจว่า V-Bounce, AWS AI-DLC, Microsoft/GitHub agentic pipeline, phase-mapping และ spec-driven development — อันไหนกำลังกลายเป็น de facto standard และมัน interoperate กันยังไง</p>
+
+    <div class="meta-row">
+      <span class="chip">METHOD <b>Deep research</b></span>
+      <span class="chip">SOURCES <b>20 fetched</b></span>
+      <span class="chip">CLAIMS <b>92 → 25 verified</b></span>
+      <span class="chip">VERDICT <b>23 ✓ / 2 ✕</b></span>
+    </div>
+
+    <div class="verdict reveal">
+      <span class="badge">คำตอบ</span>
+      <p><b>ยังไม่มี framework ไหนเป็น de facto standard</b> — กลางปี 2026 สนามนี้กำลัง <b>แตกออก (fragmenting) มากกว่ารวมกัน</b> สัญญาณที่แรงที่สุดคือ <b>Spec-Driven Development กลายเป็น "ชั้นฐานร่วม"</b> ที่เป็นจุดเริ่มของทุก vendor framework — ถ้าจะบอกว่าอะไรชนะ mindshare คือ <b>paradigm</b> นี้ ไม่ใช่ framework หรือ standards body ตัวใดตัวหนึ่ง</p>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- RADAR -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">The signal</span>
+        <h2>อ่านจากเรดาร์: ทุกอย่างยังอยู่วง "Assess"</h2>
+        <p>Thoughtworks Technology Radar — แหล่ง analyst อิสระเจ้าเดียวในเรื่องนี้ — วาง spec-driven ทั้งหมดไว้วง <b>Assess</b> (น่าลอง ยังไม่พร้อมใช้) และเตือน MCP ไว้วง <b>Hold</b></p>
+      </div>
+
+      <div class="radar-layout">
+        <div class="radar-figure reveal">
+          <svg viewBox="0 0 400 400" role="img" aria-label="แผนภาพเรดาร์แสดงตำแหน่ง spec-driven development อยู่วง Assess และ MCP อยู่วง Hold">
+            <defs>
+              <radialGradient id="rg" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="var(--accent-soft)" stop-opacity=".55"/>
+                <stop offset="100%" stop-color="var(--accent-soft)" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <circle cx="200" cy="200" r="188" fill="url(#rg)"/>
+            <!-- rings -->
+            <circle cx="200" cy="200" r="185" fill="none" stroke="var(--red)" stroke-opacity=".38" stroke-width="1"/>
+            <circle cx="200" cy="200" r="140" fill="none" stroke="var(--amber)" stroke-opacity=".5" stroke-width="1"/>
+            <circle cx="200" cy="200" r="90"  fill="none" stroke="var(--accent)" stroke-opacity=".45" stroke-width="1"/>
+            <circle cx="200" cy="200" r="45"  fill="none" stroke="var(--green)" stroke-opacity=".5" stroke-width="1"/>
+            <!-- axes -->
+            <line x1="200" y1="12" x2="200" y2="388" stroke="var(--line-strong)" stroke-width="1" stroke-dasharray="2 4"/>
+            <line x1="12" y1="200" x2="388" y2="200" stroke="var(--line-strong)" stroke-width="1" stroke-dasharray="2 4"/>
+            <!-- ring labels -->
+            <text x="200" y="203" text-anchor="middle" font-family="var(--font-mono)" font-size="8.5" fill="var(--green)" font-weight="700">ADOPT</text>
+            <text x="200" y="140" text-anchor="middle" font-family="var(--font-mono)" font-size="8.5" fill="var(--accent)" font-weight="700">TRIAL</text>
+            <text x="200" y="90" text-anchor="middle" font-family="var(--font-mono)" font-size="8.5" fill="var(--amber)" font-weight="700">ASSESS</text>
+            <text x="200" y="40" text-anchor="middle" font-family="var(--font-mono)" font-size="8.5" fill="var(--red)" font-weight="700">HOLD</text>
+            <!-- blips: SDD cluster in Assess (r~116), Hold for MCP -->
+            <!-- Spec-driven dev -->
+            <circle class="blip" cx="272" cy="118" r="4" fill="var(--amber)"/>
+            <text x="279" y="115" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink)">Spec-driven dev</text>
+            <!-- Spec Kit -->
+            <circle class="blip" cx="300" cy="168" r="4" fill="var(--amber)"/>
+            <text x="290" y="184" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink)" text-anchor="end">GitHub Spec Kit</text>
+            <!-- OpenSpec -->
+            <circle class="blip" cx="126" cy="128" r="4" fill="var(--amber)"/>
+            <text x="120" y="125" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink)" text-anchor="end">OpenSpec</text>
+            <!-- MCP by default in Hold -->
+            <circle class="blip" cx="120" cy="272" r="4" fill="var(--red)"/>
+            <text x="128" y="286" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink)">MCP by default</text>
+          </svg>
+        </div>
+
+        <div class="radar-legend">
+          <div class="ring-item"><span class="rk adopt">Adopt</span><p><b>พร้อมใช้จริง</b> — แนะนำให้ใช้เลย <span class="mono" style="color:var(--ink-faint)">(ไม่มีตัวไหนของ AI-SDLC อยู่วงนี้)</span></p></div>
+          <div class="ring-item"><span class="rk trial">Trial</span><p><b>ลองในงานจริงได้</b> — พิสูจน์แล้วในบางบริบท</p></div>
+          <div class="ring-item"><span class="rk assess">Assess</span><p><b>Spec Kit · OpenSpec · spec-driven</b> ทั้งหมดอยู่วงนี้ = น่าลองเพื่อทำความเข้าใจ ยังไม่สุก</p></div>
+          <div class="ring-item"><span class="rk hold">Hold</span><p><b>"MCP by default"</b> — เตือนไม่ให้ใช้เป็นค่าเริ่มต้น เพราะเพิ่ม abstraction tax</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FRAMEWORKS -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">The contenders</span>
+        <h2>ผู้ท้าชิง 5 framework</h2>
+        <p>แต่ละตัวมาจากคนละที่ — งานวิชาการ, vendor ใหญ่, และ pattern ทั่วไป — โดยมี spec-driven เป็นชั้นที่ทุกตัวใช้ร่วมกัน</p>
+      </div>
+
+      <div class="fw-grid">
+        <div class="fw reveal" style="--fwc:var(--ink-faint)">
+          <div class="fw-top"><h3>V-Bounce</h3><span class="tag">Academic · arXiv</span></div>
+          <ul>
+            <li>ดัดแปลง V-model — AI เป็น implementation engine</li>
+            <li>คนเปลี่ยนบทบาทเป็น validator/verifier</li>
+            <li><b>บนกระดาษเท่านั้น</b> — ไม่พบหลักฐาน adoption</li>
+          </ul>
+        </div>
+
+        <div class="fw reveal" style="--fwc:#e8912e">
+          <div class="fw-top"><h3>AWS AI-DLC</h3><span class="tag">Vendor · open-sourced</span></div>
+          <ul>
+            <li>3 เฟส: Inception → Construction → Operations</li>
+            <li>ปล่อยเป็น Amazon Q Rules + Kiro Steering Files</li>
+            <li>tool-agnostic (Q, Kiro, Cursor, Cline, Claude Code, Copilot)</li>
+          </ul>
+        </div>
+
+        <div class="fw reveal" style="--fwc:var(--accent)">
+          <div class="fw-top"><h3>MS / GitHub pipeline</h3><span class="tag">Vendor · concrete</span></div>
+          <ul>
+            <li>5 สเตจ: Spec Kit → Copilot agent → Code Quality → Actions → SRE Agent</li>
+            <li>SRE Agent ปิด loop กลับผ่าน GitHub issues</li>
+            <li>รูปธรรมที่สุด มี reference จริง</li>
+          </ul>
+        </div>
+
+        <div class="fw reveal" style="--fwc:var(--ink-soft)">
+          <div class="fw-top"><h3>Phase-mapping</h3><span class="tag">Generic pattern</span></div>
+          <ul>
+            <li>map AI tool เข้าแต่ละเฟส SDLC (7–8 เฟส)</li>
+            <li>เป็น pattern ทั่วไปในบทความ ไม่ใช่ framework เดียว</li>
+            <li>ยืดหยุ่นแต่ไม่มีโครงร่วม</li>
+          </ul>
+        </div>
+
+        <div class="fw wide reveal" style="--fwc:var(--green)">
+          <div class="fw-top"><h3>Spec-Driven Development — ชั้นฐานร่วม (substrate) ⭐</h3><span class="tag">~120,000 ★ · winning mindshare</span></div>
+          <ul>
+            <li><b>ไม่ใช่ framework เต็ม</b> แต่เป็น entry point ที่ทุกเจ้าเอาไปต่อหัวขบวน — Microsoft: <span class="mono">"Spec Kit really is the entry point that triggers the flow"</span></li>
+            <li><b>GitHub Spec Kit</b> = สัญญาณ adoption แรงสุด: ~119,500 ★ / ~10,600 forks, tool-agnostic กับ agent 30+ ตัว (official 42)</li>
+            <li>workflow: <span class="mono">specify → plan → tasks → implement</span> (ขยายเป็น 7–8 คำสั่ง รวม constitution, clarify, analyze, converge)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPOSE / PIPELINE -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">How they compose</span>
+        <h2>ต่อกันเป็นชั้น — ไม่ใช่แข่งกันตรง ๆ</h2>
+        <p>framework ต่าง ๆ interoperate แบบหลวม ๆ: SDD เป็นหัว, agentic coding อยู่กลาง, ops/SRE agent อยู่ท้าย โดยมี MCP เป็น "ตัวเลือก" การเชื่อม (ยังถกเถียง)</p>
+      </div>
+
+      <div class="stack">
+        <div class="layer reveal">
+          <div class="l-label">Front-end · Substrate</div>
+          <h3>Spec-Driven Development</h3>
+          <p>แปลง intent → constitution / requirements / plan / tasks</p>
+          <div class="tools"><span class="t">Spec Kit</span><span class="t">Kiro</span><span class="t">OpenSpec</span><span class="t">BMAD</span></div>
+        </div>
+        <div class="connector" aria-hidden="true"><svg viewBox="0 0 16 26"><path d="M8 0v18M3 13l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></div>
+        <div class="layer reveal">
+          <div class="l-label">Middle · Build & Review</div>
+          <h3>Agentic coding + AI review</h3>
+          <p>รับ task → เขียนโค้ดหลายไฟล์ → commits, PR → AI code-quality review</p>
+          <div class="tools"><span class="t">Copilot coding agent</span><span class="t">Claude Code</span><span class="t">Cursor</span><span class="t">Devin</span></div>
+        </div>
+        <div class="connector" aria-hidden="true"><svg viewBox="0 0 16 26"><path d="M8 0v18M3 13l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></div>
+        <div class="layer reveal">
+          <div class="l-label">Tail · Operate</div>
+          <h3>Ops / SRE agents</h3>
+          <p>เฝ้า telemetry (logs/metrics/traces) → เจอ incident → เปิด issue → เชื่อมด้วย MCP (40+ connectors)</p>
+          <div class="tools"><span class="t">Azure SRE Agent</span><span class="t">Sentry</span></div>
+        </div>
+      </div>
+      <p class="loop-note reveal">↺ SRE Agent ปิด loop กลับไปหา coding agent ผ่าน GitHub issues — ภายใต้การ approve ของมนุษย์</p>
+    </div>
+  </section>
+
+  <!-- MCP CONTESTED -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Point of tension</span>
+        <h2>MCP — interop layer ที่ยังถกเถียง</h2>
+        <p>Model Context Protocol เกี่ยวข้องจริง แต่ยัง <b>ไม่ใช่</b> substrate ที่ตกลงกันได้ — vendor กับ analyst มองต่างกันชัด</p>
+      </div>
+      <div class="versus">
+        <div class="view pro reveal">
+          <div class="who">◆ Microsoft — สนับสนุน</div>
+          <p>Azure SRE Agent เชื่อม observability / DevOps / incident / code ผ่าน MCP — 40+ connectors</p>
+          <p class="quote">"…connects tools via Model Context Protocol (MCP)… avoids lock-in"</p>
+        </div>
+        <div class="view con reveal">
+          <div class="who">▲ Thoughtworks — เตือน</div>
+          <p>วาง <b>"MCP by default"</b> ไว้วง Hold/Caution — ทุกชั้น protocol ที่คั่น agent กับ API ทำให้สูญเสีย fidelity</p>
+          <p class="quote">"almost everything I might achieve with an MCP can be handled by a CLI tool instead" — Simon Willison</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THOUGHTWORKS DEEP DIVE -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">The independent read</span>
+        <h2>Thoughtworks มองยังไง — และมันแตกเป็น 2 ค่าย</h2>
+        <p>Radar ชี้ว่าเครื่องมือแต่ละตัว "ตีความ SDD ต่างกัน" (distinct interpretations) และทีมกำลังแยกเป็นสองแนวคิด</p>
+      </div>
+
+      <div class="camps">
+        <div class="camp reveal">
+          <div class="cn">Camp A</div>
+          <h3>Minimal structure</h3>
+          <p>พึ่งความสามารถของ coding agent ที่เก่งขึ้นเรื่อย ๆ — spec เบา โครงสร้างน้อย</p>
+        </div>
+        <div class="camp reveal">
+          <div class="cn">Camp B</div>
+          <h3>Defined workflow</h3>
+          <p>เน้น workflow ชัดเจน + spec ละเอียด — ควบคุมทุกขั้นตอน</p>
+        </div>
+      </div>
+
+      <div style="margin-top:22px" class="table-scroll">
+        <table>
+          <thead><tr><th>เครื่องมือ</th><th>ลักษณะเฉพาะ</th><th>เหมาะกับ</th></tr></thead>
+          <tbody>
+            <tr><td><b>Spec Kit</b> <span class="mono" style="color:var(--ink-faint)">GitHub</span></td><td class="sub">workflow ละเอียด มี "constitution" เป็น rulebook</td><td><span class="pill assess">greenfield</span></td></tr>
+            <tr><td><b>Kiro</b> <span class="mono" style="color:var(--ink-faint)">AWS</span></td><td class="sub">spec-first markdown, ผูก IDE เฉพาะ (lock-in)</td><td class="sub">—</td></tr>
+            <tr><td><b>Tessl</b></td><td class="sub">มอง spec เป็น artifact ที่ต้อง maintain ตลอด</td><td class="sub">—</td></tr>
+            <tr><td><b>OpenSpec</b></td><td class="sub">iterative + tool-agnostic (เบา ยืดหยุ่น)</td><td><span class="pill green">brownfield</span></td></tr>
+            <tr><td><b>BMAD</b></td><td class="sub">หนัก, workflow เข้มงวด (rigid)</td><td class="sub">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- LATEST UPDATE -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Latest · Vol. 34 — เม.ย. 2026</span>
+        <h2>เวอร์ชันล่าสุด: ไม่ได้อ่อนลง — ระวังมากขึ้น</h2>
+        <p>ผ่านมา 2 รอบ (Vol. 33 พ.ย. 2025 → Vol. 34 เม.ย. 2026) spec-driven <b>ยังไม่ขยับขึ้น Trial/Adopt</b> และมีข้อกังวลใหม่เพิ่ม</p>
+      </div>
+
+      <div class="update-band reveal">
+        <div class="body-col" style="max-width:none">
+          <p style="color:var(--ink-soft)"><b>ข้อกังวลใหม่:</b> workflow ยัง "elaborate and opinionated" · สร้าง spec files ยาวจนรีวิวยาก · ไม่ชัดว่าใครคือผู้ใช้เป้าหมาย</p>
+        </div>
+
+        <p class="eyebrow" style="margin-top:10px">4 ธีมใหญ่ของ Vol. 34</p>
+        <div class="themes">
+          <div class="theme"><span class="num"></span><p><b>Retaining principles, relinquishing patterns</b> — เก็บหลักวิศวกรรม (zero trust, DORA) ทิ้ง pattern เก่า</p></div>
+          <div class="theme"><span class="num"></span><p><b>Securing permission-hungry agents</b> — agent หิว permission ต้อง sandbox + defense in depth</p></div>
+          <div class="theme"><span class="num"></span><p><b>Putting coding agents on a leash</b> — คุมด้วย harness: SDD + Agent Skills (feedforward) · mutation testing (feedback)</p></div>
+          <div class="theme"><span class="num"></span><p><b>Evaluating tech in an agentic world</b> — tool โผล่เร็วจน assess ยาก</p></div>
+        </div>
+
+        <div class="cols" style="margin-top:20px">
+          <div>
+            <p class="eyebrow" style="margin-bottom:10px">แนวคิดใหม่</p>
+            <ul class="stack-list">
+              <li><b>Cognitive Debt</b> — AI สร้างโค้ดเยอะ ช่องว่าง dev ↔ ระบบถ่างออก</li>
+              <li><b>Semantic Diffusion</b> — ศัพท์ใหม่เกิดเร็วกว่าความหมายจะนิ่ง</li>
+              <li><b>OpenSpec</b> ถูกยกเด่น (<span class="mono">propose → apply → archive</span>)</li>
+            </ul>
+          </div>
+          <div>
+            <p class="eyebrow" style="margin-bottom:10px">Bitter lesson</p>
+            <p style="color:var(--ink-soft);font-size:14px;font-style:italic">"teams may be relearning a bitter lesson — that handcrafting detailed rules for AI ultimately doesn't scale"</p>
+          </div>
+        </div>
+
+        <blockquote class="pullquote">
+          "จุดเปลี่ยนที่เราอยู่ ไม่ใช่เรื่องเทคโนโลยี — แต่เป็นเรื่องเทคนิค"
+          <span class="attr">— Rachel Laycock, CTO · Thoughtworks</span>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAVEATS -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Read with care</span>
+        <h2>ข้อควรระวัง · claim ที่ตีตก · คำถามเปิด</h2>
+      </div>
+
+      <div class="cols">
+        <div class="box reveal">
+          <h3>Caveats</h3>
+          <ul class="stack-list">
+            <li>แหล่ง primary ส่วนใหญ่เป็น <b>vendor blog</b> — analyst อิสระจริงมีแค่ Thoughtworks</li>
+            <li><b>ไม่มี</b> Gartner MQ / Forrester Wave ครอบคลุม category นี้</li>
+            <li><b>V-Bounce</b> เป็น proposal บนกระดาษ ไม่พบ adoption</li>
+            <li>ข้อสรุป "winning mindshare" อิงจาก star count + การที่ SDD โผล่เป็น entry point ซ้ำ ๆ</li>
+            <li>ข้อมูลเปลี่ยนเร็ว — star, ring, tool list เปลี่ยนรายเดือน</li>
+          </ul>
+        </div>
+        <div class="box reveal">
+          <h3>Claims ที่ถูกตีตก</h3>
+          <ul class="stack-list refuted">
+            <li>"AI-DLC วางตัวเป็น replacement ของ SDLC เดิม" — ตีตก 1-2</li>
+            <li>"ไม่มี Gartner/Forrester coverage AIDLC เป็น construct เดียว" — ตีตก 0-3</li>
+          </ul>
+          <h3 style="margin-top:20px">คำถามที่ยังเปิด</h3>
+          <ul class="stack-list">
+            <li>จะมี standards body เป็นกลางเกิดขึ้น หรือ de facto จะมาจาก vendor เท่านั้น?</li>
+            <li>สองค่าย (minimal vs detailed) จะรวมกันไหม?</li>
+            <li>adoption จริงระดับ production ลึกแค่ไหน?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="eyebrow">Sources</span>
+    <div class="src">
+      <a href="https://www.thoughtworks.com/en-us/radar/techniques/spec-driven-development">thoughtworks.com/radar/techniques/spec-driven-development</a>
+      <a href="https://www.thoughtworks.com/about-us/news/2026/combat-ai-cognitive-debt-radar-v34">thoughtworks.com — Radar Vol. 34 news release</a>
+      <a href="https://arxiv.org/abs/2408.03416">arxiv.org/abs/2408.03416 — The AI-Native SDLC (V-Bounce)</a>
+      <a href="https://aws.amazon.com/blogs/devops/ai-driven-development-life-cycle/">aws.amazon.com — AI-Driven Development Life Cycle</a>
+      <a href="https://github.com/github/spec-kit">github.com/github/spec-kit</a>
+      <a href="https://techcommunity.microsoft.com/blog/appsonazureblog/an-ai-led-sdlc-building-an-end-to-end-agentic-software-development-lifecycle-wit/4491896">techcommunity.microsoft.com — An AI-led SDLC (agentic pipeline)</a>
+    </div>
+    <p class="method">DEEP RESEARCH · 5 angles → 20 sources fetched → 92 claims → 25 adversarially verified (23 confirmed / 2 refuted) · anchored พ.ย. 2025 – ก.ค. 2026 · จัดทำ 2026-07-12</p>
+  </div>
+</footer>

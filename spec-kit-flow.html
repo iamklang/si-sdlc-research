@@ -1,0 +1,1029 @@
+<title>Spec Kit Flow — Spec-Driven Development</title>
+<style>
+  :root{
+    --ground:#eaeef1; --surface:#ffffff; --surface-2:#f4f7f8; --surface-3:#eef2f4;
+    --ink:#161e26; --ink-soft:#47535f; --ink-faint:#7a8792;
+    --line:#d7dee3; --line-strong:#c1cad1;
+    --accent:#12717e; --accent-ink:#0a5560; --accent-soft:#dcecee;
+    --amber:#a06f0c; --amber-soft:#f4ead2; --amber-line:#e3c98a;
+    --green:#3a8a5b; --green-soft:#dcefe2; --green-line:#a9d6ba;
+    --red:#b0463c; --red-soft:#f3ddd9;
+    --font-sans:system-ui,-apple-system,"Segoe UI","Noto Sans Thai","Thonburi",Roboto,sans-serif;
+    --font-mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --maxw:840px;
+    --shadow:0 1px 2px rgba(16,30,40,.04),0 4px 16px rgba(16,30,40,.05);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#0c1015; --surface:#141b22; --surface-2:#1a222b; --surface-3:#212b35;
+      --ink:#e6edf3; --ink-soft:#a5b2be; --ink-faint:#6c7a88;
+      --line:#26313c; --line-strong:#354250;
+      --accent:#46b4c1; --accent-ink:#7fd0da; --accent-soft:#123037;
+      --amber:#d3a63a; --amber-soft:#2e2611; --amber-line:#4c3f1a;
+      --green:#5cb682; --green-soft:#16301f; --green-line:#2c5138;
+      --red:#d67a70; --red-soft:#331915;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.28);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#eaeef1; --surface:#ffffff; --surface-2:#f4f7f8; --surface-3:#eef2f4;
+    --ink:#161e26; --ink-soft:#47535f; --ink-faint:#7a8792;
+    --line:#d7dee3; --line-strong:#c1cad1;
+    --accent:#12717e; --accent-ink:#0a5560; --accent-soft:#dcecee;
+    --amber:#a06f0c; --amber-soft:#f4ead2; --amber-line:#e3c98a;
+    --green:#3a8a5b; --green-soft:#dcefe2; --green-line:#a9d6ba;
+    --red:#b0463c; --red-soft:#f3ddd9;
+    --shadow:0 1px 2px rgba(16,30,40,.04),0 4px 16px rgba(16,30,40,.05);
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c1015; --surface:#141b22; --surface-2:#1a222b; --surface-3:#212b35;
+    --ink:#e6edf3; --ink-soft:#a5b2be; --ink-faint:#6c7a88;
+    --line:#26313c; --line-strong:#354250;
+    --accent:#46b4c1; --accent-ink:#7fd0da; --accent-soft:#123037;
+    --amber:#d3a63a; --amber-soft:#2e2611; --amber-line:#4c3f1a;
+    --green:#5cb682; --green-soft:#16301f; --green-line:#2c5138;
+    --red:#d67a70; --red-soft:#331915;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.28);
+  }
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--font-sans);
+    line-height:1.6;-webkit-font-smoothing:antialiased;font-size:16px;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px;}
+  h1,h2,h3{text-wrap:balance;line-height:1.18;letter-spacing:-.01em;font-weight:750;margin:0;}
+  p{margin:0;}
+  .mono{font-family:var(--font-mono);}
+  .eyebrow{font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:8px;}
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--accent);opacity:.6;}
+
+  /* hero */
+  header.hero{background:var(--surface);border-bottom:1px solid var(--line);position:relative;overflow:hidden;}
+  .hero-grid{position:absolute;inset:0;opacity:.5;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:32px 32px;-webkit-mask-image:radial-gradient(120% 90% at 15% 0%,#000,transparent 68%);
+    mask-image:radial-gradient(120% 90% at 15% 0%,#000,transparent 68%);pointer-events:none;}
+  .hero-inner{position:relative;padding:50px 0 42px;}
+  .kicker{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;
+    font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;color:var(--ink-faint);}
+  .kicker .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);
+    box-shadow:0 0 0 4px var(--accent-soft);display:inline-block;margin-right:9px;vertical-align:middle;}
+  h1{font-size:clamp(28px,5.8vw,46px);font-weight:800;letter-spacing:-.025em;margin:8px 0 16px;}
+  h1 .hl{color:var(--accent);}
+  .hero p.lead{font-size:18px;color:var(--ink-soft);max-width:60ch;}
+  .example-badge{margin-top:24px;display:inline-flex;align-items:center;gap:10px;
+    background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:9px 14px;
+    font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);}
+  .example-badge b{color:var(--ink);}
+  .example-badge .k{color:var(--accent);font-weight:700;}
+
+  /* command overview strip */
+  .cmd-strip{display:flex;flex-wrap:wrap;gap:7px;margin-top:26px;}
+  .cmd-strip .c{font-family:var(--font-mono);font-size:12px;color:var(--accent-ink);
+    background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);
+    border-radius:7px;padding:5px 10px;}
+  .cmd-strip .arw{color:var(--ink-faint);align-self:center;font-family:var(--font-mono);font-size:12px;}
+
+  section{padding:44px 0;border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+  .sec-head{margin-bottom:28px;}
+  .sec-head h2{font-size:clamp(20px,3.3vw,26px);margin:12px 0 6px;}
+  .sec-head p{color:var(--ink-soft);max-width:62ch;}
+
+  /* PIPELINE */
+  .pipeline{position:relative;display:flex;flex-direction:column;gap:16px;}
+  .pipeline::before{content:"";position:absolute;left:19px;top:14px;bottom:14px;width:2px;
+    background:linear-gradient(var(--accent),var(--green));opacity:.35;}
+  @media(min-width:620px){.pipeline::before{left:23px;}}
+  .stage{position:relative;display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:start;}
+  @media(min-width:620px){.stage{grid-template-columns:48px 1fr;gap:18px;}}
+  .node{position:relative;z-index:2;width:40px;height:40px;border-radius:11px;flex:none;
+    display:grid;place-items:center;font-family:var(--font-mono);font-weight:700;font-size:14px;
+    background:var(--surface);border:2px solid var(--accent);color:var(--accent);box-shadow:var(--shadow);}
+  @media(min-width:620px){.node{width:48px;height:48px;}}
+  .stage.gate .node{border-color:var(--amber);color:var(--amber);}
+  .stage.done .node{border-color:var(--green);color:var(--green);}
+  .stage.opt .node{border-style:dashed;border-color:var(--ink-faint);color:var(--ink-faint);}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;
+    box-shadow:var(--shadow);}
+  .stage.gate .card{border-color:var(--amber-line);}
+  .stage.done .card{border-color:var(--green-line);}
+  .stage.opt .card{border-style:dashed;background:var(--surface-2);}
+  .card-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px;margin-bottom:10px;}
+  .cmd{font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--accent-ink);
+    background:var(--accent-soft);border-radius:7px;padding:3px 9px;}
+  .stage.gate .cmd{color:var(--amber);background:var(--amber-soft);}
+  .stage.done .cmd{color:var(--green);background:var(--green-soft);}
+  .stage.opt .cmd{color:var(--ink-soft);background:var(--surface-3);}
+  .role{font-size:14px;color:var(--ink-soft);font-weight:600;}
+
+  .io{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:2px 0 12px;font-size:13px;}
+  .io .lbl{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--ink-faint);}
+  .io .val{color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:3px 9px;}
+  .io .arrow{color:var(--accent);font-weight:700;font-family:var(--font-mono);}
+  .files{display:flex;flex-wrap:wrap;gap:6px;}
+  .file{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);background:var(--surface-3);
+    border:1px solid var(--line);border-radius:6px;padding:3px 9px;display:inline-flex;gap:6px;align-items:center;}
+  .file::before{content:"▪";color:var(--accent);}
+  .stage.done .file::before{color:var(--green);}
+  .flag{margin-top:11px;font-size:12.5px;border-radius:8px;padding:8px 11px;display:flex;gap:8px;align-items:flex-start;}
+  .flag.amber{background:var(--amber-soft);border:1px solid var(--amber-line);color:var(--ink);}
+  .flag.green{background:var(--green-soft);border:1px solid var(--green-line);color:var(--ink);}
+  .flag b{font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;flex:none;}
+  .flag.amber b{color:var(--amber);}
+  .flag.green b{color:var(--green);}
+
+  /* mechanics */
+  .mech{display:grid;grid-template-columns:1fr;gap:14px;}
+  @media(min-width:680px){.mech{grid-template-columns:repeat(3,1fr);}}
+  .mcard{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:18px;box-shadow:var(--shadow);
+    position:relative;overflow:hidden;}
+  .mcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--mc,var(--accent));}
+  .mcard .mi{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--mc,var(--accent));margin-bottom:8px;}
+  .mcard h3{font-size:15.5px;margin-bottom:7px;}
+  .mcard p{font-size:13.5px;color:var(--ink-soft);}
+  .mcard code{font-family:var(--font-mono);font-size:12px;background:var(--surface-2);border:1px solid var(--line);
+    border-radius:4px;padding:1px 5px;color:var(--ink);}
+
+  /* traceability strand */
+  .trace-scroll{overflow-x:auto;padding-bottom:6px;}
+  .trace{display:flex;align-items:stretch;gap:0;min-width:640px;}
+  .tnode{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:13px 14px;
+    box-shadow:var(--shadow);position:relative;}
+  .tconn{flex:none;width:30px;display:grid;place-items:center;color:var(--accent);font-family:var(--font-mono);font-weight:700;}
+  .tnode .src{font-family:var(--font-mono);font-size:10px;color:var(--ink-faint);letter-spacing:.04em;margin-bottom:6px;}
+  .tnode .val{font-size:12.5px;color:var(--ink);line-height:1.45;}
+  .tnode .val b{color:var(--accent-ink);}
+  .trace-cap{margin-top:14px;font-size:13.5px;color:var(--ink-soft);}
+  .trace-cap b{color:var(--ink);}
+
+  /* human gates note */
+  .human{display:flex;gap:14px;align-items:flex-start;background:var(--amber-soft);border:1px solid var(--amber-line);
+    border-radius:14px;padding:18px 20px;}
+  .human .ic{flex:none;font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--amber);background:color-mix(in srgb,var(--amber) 14%,transparent);border:1px solid var(--amber-line);
+    border-radius:7px;padding:6px 9px;}
+  .human p{font-size:14.5px;color:var(--ink);}
+  .human b{color:var(--ink);}
+
+  footer{padding:34px 0 44px;color:var(--ink-faint);}
+  footer .note{font-family:var(--font-mono);font-size:12px;line-height:1.8;border-top:1px solid var(--line);
+    padding-top:18px;}
+  footer a{color:var(--ink-soft);}
+
+  /* flow3: input → action → output */
+  .flow3{display:grid;grid-template-columns:1fr;gap:8px;margin-top:2px;}
+  @media(min-width:600px){.flow3{grid-template-columns:1fr 16px minmax(0,1.2fr) 16px 1fr;align-items:stretch;gap:7px;}}
+  .fcell{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:9px 11px;
+    display:flex;flex-direction:column;gap:5px;min-width:0;}
+  .fcell.act{background:var(--surface-3);}
+  .fl{font-family:var(--font-mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);}
+  .fcell.in .fl{color:var(--accent);}
+  .fcell.act .fl{color:var(--amber);}
+  .fcell.out .fl{color:var(--green);}
+  .fv{font-size:12.5px;color:var(--ink);line-height:1.45;}
+  .fchev{display:none;}
+  @media(min-width:600px){.fchev{display:grid;place-items:center;color:var(--ink-faint);font-family:var(--font-mono);font-size:12px;}}
+  .actors{display:flex;flex-wrap:wrap;gap:5px;margin-top:1px;}
+  .actor{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.03em;border-radius:5px;padding:2px 7px;}
+  .actor.human{color:var(--amber);background:var(--amber-soft);border:1px solid var(--amber-line);}
+  .actor.ai{color:var(--accent-ink);background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);}
+
+  /* editor / file viewer */
+  .editor{border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);background:var(--surface);}
+  .filetabs{display:flex;gap:3px;overflow-x:auto;background:var(--surface-2);border-bottom:1px solid var(--line);padding:7px 7px 0;}
+  .ftab{font-family:var(--font-mono);font-size:12px;white-space:nowrap;border:1px solid transparent;border-bottom:none;
+    background:transparent;color:var(--ink-soft);padding:8px 12px;border-radius:8px 8px 0 0;cursor:pointer;line-height:1;}
+  .ftab:hover{color:var(--ink);background:var(--surface-3);}
+  .ftab[aria-selected="true"]{background:var(--surface);color:var(--accent-ink);border-color:var(--line);font-weight:700;
+    box-shadow:0 1px 0 0 var(--surface);}
+  .codebar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 16px;
+    border-bottom:1px solid var(--line);background:var(--surface);}
+  .codebar .fname{font-size:12px;color:var(--ink);word-break:break-all;}
+  .codebar .stage-tag{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;flex:none;
+    color:var(--accent);background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);
+    border-radius:6px;padding:3px 8px;white-space:nowrap;}
+  pre.code{margin:0;padding:18px;overflow:auto;font-family:var(--font-mono);font-size:12.5px;line-height:1.65;
+    color:var(--ink-soft);background:var(--surface);max-height:440px;white-space:pre;tab-size:2;}
+  .editor-hint{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);margin-top:12px;text-align:center;}
+
+  @media (prefers-reduced-motion:no-preference){
+    .reveal{opacity:0;transform:translateY(9px);animation:rise .55s cubic-bezier(.2,.7,.3,1) forwards;}
+    @keyframes rise{to{opacity:1;transform:none;}}
+  }
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px;}
+</style>
+
+<header class="hero">
+  <div class="hero-grid" aria-hidden="true"></div>
+  <div class="wrap hero-inner">
+    <div class="kicker">
+      <span><span class="dot"></span>GITHUB SPEC KIT · SDD FLOW</span>
+      <span>WORKED EXAMPLE</span>
+    </div>
+    <span class="eyebrow">Spec-Driven Development</span>
+    <h1>spec มาก่อน โค้ดตามหลัง —<br><span class="hl">flow ของ Spec Kit</span></h1>
+    <p class="lead">7 คำสั่ง เปลี่ยน "ประโยคภาษาคน" ให้กลายเป็นโค้ดที่ทดสอบแล้ว โดยมี spec เป็น source of truth และมนุษย์เป็นผู้ validate ทุกช่วงต่อ</p>
+
+    <div class="example-badge"><span class="k">DEMO</span> ตัวอย่างที่ใช้ตลอดหน้า: <b>To-do Task API</b> · <span class="mono">specs/001-todo-task-api/</span></div>
+
+    <div class="cmd-strip" aria-hidden="true">
+      <span class="c">/constitution</span><span class="arw">→</span>
+      <span class="c">/specify</span><span class="arw">→</span>
+      <span class="c">/clarify</span><span class="arw">→</span>
+      <span class="c">/plan</span><span class="arw">→</span>
+      <span class="c">/tasks</span><span class="arw">→</span>
+      <span class="c">/implement</span><span class="arw">→</span>
+      <span class="c">/analyze</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- PIPELINE -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">The pipeline</span>
+        <h2>แต่ละคำสั่งสร้าง artifact อะไร</h2>
+        <p>ทุกสเตจรับ input จากสเตจก่อนหน้า แล้วผลิตไฟล์ที่กลายเป็น input ของสเตจถัดไป — spec ค่อย ๆ ตกผลึกจนพร้อมให้ agent ลงมือ</p>
+      </div>
+
+      <div class="pipeline">
+        <div class="stage reveal">
+          <div class="node">1</div>
+          <div class="card">
+            <div class="card-top"><span class="cmd">/constitution</span><span class="role">ตั้งกติกาที่บังคับทุกสเตจ</span></div>
+            <div class="flow3">
+              <div class="fcell in"><span class="fl">Input</span><span class="fv">หลักการทีม (คุณภาพ, การทดสอบ, style)</span></div>
+              <div class="fchev">▶</div>
+              <div class="fcell act"><span class="fl">Action</span><span class="fv">เขียน/ตกลงกติกาของทีม</span><div class="actors"><span class="actor human">คน</span></div></div>
+              <div class="fchev">▶</div>
+              <div class="fcell out"><span class="fl">Output</span><div class="files"><span class="file">.specify/memory/constitution.md</span></div></div>
+            </div>
+            <div class="flag amber"><b>rulebook</b><span>หลัก "Test-First (NON-NEGOTIABLE)" ที่ตั้งตรงนี้ จะไปบังคับลำดับงานใน /tasks</span></div>
+          </div>
+        </div>
+
+        <div class="stage reveal">
+          <div class="node">2</div>
+          <div class="card">
+            <div class="card-top"><span class="cmd">/specify</span><span class="role">บอก "อะไร/ทำไม" — ห้ามพูดถึงเทคโนโลยี</span></div>
+            <div class="flow3">
+              <div class="fcell in"><span class="fl">Input</span><span class="fv">ประโยคภาษาคน: "REST API จัดการ to-do task…"</span></div>
+              <div class="fchev">▶</div>
+              <div class="fcell act"><span class="fl">Action</span><span class="fv">AI ร่าง spec (WHAT/WHY) จาก intent</span><div class="actors"><span class="actor ai">AI</span></div></div>
+              <div class="fchev">▶</div>
+              <div class="fcell out"><span class="fl">Output</span><div class="files"><span class="file">spec.md</span></div></div>
+            </div>
+            <div class="flag amber"><b>what · not how</b><span>มีแต่ user story + <span class="mono">FR-001…FR-010</span> + Key Entities — ไม่มีชื่อ framework หรือ DB เลย</span></div>
+          </div>
+        </div>
+
+        <div class="stage gate reveal">
+          <div class="node">3</div>
+          <div class="card">
+            <div class="card-top"><span class="cmd">/clarify</span><span class="role">อุดช่องว่างก่อนลงมือ (human gate)</span></div>
+            <div class="flow3">
+              <div class="fcell in"><span class="fl">Input</span><span class="fv">คำถามที่ AI ถามกลับ (จุดที่กำกวมใน spec)</span></div>
+              <div class="fchev">▶</div>
+              <div class="fcell act"><span class="fl">Action</span><span class="fv">ตอบคำถาม / ตัดสินใจ scope</span><div class="actors"><span class="actor human">คน</span></div></div>
+              <div class="fchev">▶</div>
+              <div class="fcell out"><span class="fl">Output</span><div class="files"><span class="file">spec.md (updated)</span></div></div>
+            </div>
+            <div class="flag amber"><b>ตัวอย่าง</b><span>เคลียร์ <span class="mono">[NEEDS CLARIFICATION]</span>: ชื่อยาว ≤200 · เรียงใหม่สุดก่อน · ยังไม่ต้องมี auth → Out of Scope</span></div>
+          </div>
+        </div>
+
+        <div class="stage gate reveal">
+          <div class="node">4</div>
+          <div class="card">
+            <div class="card-top"><span class="cmd">/plan</span><span class="role">เลือก "ยังไง" (HOW) + ผ่าน gate</span></div>
+            <div class="flow3">
+              <div class="fcell in"><span class="fl">Input</span><span class="fv">spec.md + เลือก tech: "FastAPI + SQLite + pytest"</span></div>
+              <div class="fchev">▶</div>
+              <div class="fcell act"><span class="fl">Action</span><span class="fv">AI ทำแผน+contract → คนยืนยันผ่าน Constitution Check</span><div class="actors"><span class="actor ai">AI</span><span class="actor human">คน (gate)</span></div></div>
+              <div class="fchev">▶</div>
+              <div class="fcell out"><span class="fl">Output</span><div class="files"><span class="file">plan.md</span><span class="file">data-model.md</span><span class="file">contracts/openapi.yaml</span></div></div>
+            </div>
+            <div class="flag amber"><b>constitution check</b><span>ต้องเช็กว่าแผนไม่ขัดกติกาก่อนไปต่อ — และสร้าง API contract <em>ก่อน</em> เขียนโค้ด (หลัก API-First)</span></div>
+          </div>
+        </div>
+
+        <div class="stage reveal">
+          <div class="node">5</div>
+          <div class="card">
+            <div class="card-top"><span class="cmd">/tasks</span><span class="role">แตกงานย่อยเรียงตาม dependency</span></div>
+            <div class="flow3">
+              <div class="fcell in"><span class="fl">Input</span><span class="fv">plan + data-model + contracts (อ่านอัตโนมัติ)</span></div>
+              <div class="fchev">▶</div>
+              <div class="fcell act"><span class="fl">Action</span><span class="fv">AI แตกงานเรียง dependency แบบ TDD</span><div class="actors"><span class="actor ai">AI</span></div></div>
+              <div class="fchev">▶</div>
+              <div class="fcell out"><span class="fl">Output</span><div class="files"><span class="file">tasks.md · T001–T015</span></div></div>
+            </div>
+            <div class="flag amber"><b>tdd order</b><span>เทสต์ 🔴 (Phase B) มาก่อนโค้ดจริง 🟢 (Phase C) เสมอ · <span class="mono">[P]</span> = ทำขนานกันได้</span></div>
+          </div>
+        </div>
+
+        <div class="stage done reveal">
+          <div class="node">6</div>
+          <div class="card">
+            <div class="card-top"><span class="cmd">/implement</span><span class="role">agent ลงมือ ตาม tasks.md</span></div>
+            <div class="flow3">
+              <div class="fcell in"><span class="fl">Input</span><span class="fv">tasks.md (อ่านอัตโนมัติ)</span></div>
+              <div class="fchev">▶</div>
+              <div class="fcell act"><span class="fl">Action</span><span class="fv">AI เขียนเทสต์+โค้ด ไล่ทีละ task → คน review PR</span><div class="actors"><span class="actor ai">AI</span><span class="actor human">คน (review)</span></div></div>
+              <div class="fchev">▶</div>
+              <div class="fcell out"><span class="fl">Output</span><div class="files"><span class="file">src/</span><span class="file">tests/</span><span class="file">Pull Request</span></div></div>
+            </div>
+            <div class="flag green"><b>ผลลัพธ์</b><span>ไล่ T001→T015, รันเทสต์หลังทุกสเตจ, หยุดให้คน review เมื่อติด</span></div>
+          </div>
+        </div>
+
+        <div class="stage opt reveal">
+          <div class="node">7</div>
+          <div class="card">
+            <div class="card-top"><span class="cmd">/analyze</span><span class="role">ตรวจความสอดคล้อง (optional)</span></div>
+            <div class="flow3">
+              <div class="fcell in"><span class="fl">Input</span><span class="fv">spec ↔ plan ↔ tasks ↔ code (ทุก artifact)</span></div>
+              <div class="fchev">▶</div>
+              <div class="fcell act"><span class="fl">Action</span><span class="fv">AI ตรวจความสอดคล้อง → คนอ่านรายงาน+ตัดสินใจ merge</span><div class="actors"><span class="actor ai">AI</span><span class="actor human">คน</span></div></div>
+              <div class="fchev">▶</div>
+              <div class="fcell out"><span class="fl">Output</span><div class="files"><span class="file">consistency report</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL ARTIFACTS -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">The artifacts</span>
+        <h2>ไฟล์จริงที่เดโมสร้างขึ้น</h2>
+        <p>นี่คือเนื้อหาจริงของแต่ละไฟล์ในโปรเจกต์ <span class="mono">spec-kit-demo/</span> — คลิกแท็บเพื่อดูว่าแต่ละคำสั่งผลิตอะไรออกมา</p>
+      </div>
+      <div class="editor reveal">
+        <div class="filetabs" role="tablist" aria-label="ไฟล์เดโม"></div>
+        <div class="codebar">
+          <span class="fname mono"></span>
+          <span class="stage-tag"></span>
+        </div>
+        <pre class="code" id="codeout" tabindex="0" aria-live="polite"></pre>
+      </div>
+      <p class="editor-hint">11 ไฟล์ · spec artifacts (6) → โค้ดจริงจาก /implement (5): db · models · routes · main · tests</p>
+    </div>
+  </section>
+
+  <!-- KEY MECHANICS -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Why it's "spec-driven"</span>
+        <h2>3 กลไกที่ทำให้ flow นี้ทำงาน</h2>
+        <p>ไม่ใช่แค่ลำดับคำสั่ง — แต่คือกติกาที่ผูกทุกสเตจเข้าหากันและกันเอาไว้ผ่าน artifact</p>
+      </div>
+      <div class="mech">
+        <div class="mcard reveal" style="--mc:var(--amber)">
+          <div class="mi">01 · Binds everything</div>
+          <h3>Constitution เหนือทุกสเตจ</h3>
+          <p>กติกาที่ตั้งใน <code>/constitution</code> ถูกบังคับตอน <code>/plan</code> (gate) และแปลงเป็นลำดับงานใน <code>/tasks</code> — เป็นสิ่งที่ Thoughtworks ชี้ว่าเป็นเอกลักษณ์ของ Spec Kit</p>
+        </div>
+        <div class="mcard reveal" style="--mc:var(--green)">
+          <div class="mi">02 · Test before code</div>
+          <h3>TDD ฝังในลำดับงาน</h3>
+          <p>เทสต์ต้องแดงก่อน (<code>Phase B</code>) แล้วโค้ดจริงถึงตามมา (<code>Phase C</code>) — บังคับโดยหลัก "Test-First" ในรัฐธรรมนูญ ไม่ใช่แค่คำแนะนำ</p>
+        </div>
+        <div class="mcard reveal" style="--mc:var(--accent)">
+          <div class="mi">03 · Human as validator</div>
+          <h3>คนคุมที่จุดต่อ</h3>
+          <p>มนุษย์ตัดสินใจที่ <code>/clarify</code> (ตอบคำถาม) และ review ระหว่าง <code>/implement</code> — AI เป็น engine, คนเป็นผู้ตรวจสอบ</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRACEABILITY -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">The thread</span>
+        <h2>ตามรอย 1 requirement ทะลุทุก artifact</h2>
+        <p>จุดแข็งของ spec-driven คือ "ความสืบสาวได้" — ดูว่ากฎ "ชื่อ ≤200 ตัวอักษร" เดินทางจาก spec ไปจนถึงเทสต์ยังไง</p>
+      </div>
+
+      <div class="trace-scroll">
+        <div class="trace">
+          <div class="tnode reveal">
+            <div class="src">spec.md</div>
+            <div class="val"><b>FR-009</b> ชื่อ task ต้องยาว ≤ 200 ตัวอักษร</div>
+          </div>
+          <div class="tconn">→</div>
+          <div class="tnode reveal">
+            <div class="src">clarify</div>
+            <div class="val">Q1 → ตอบ <b>"200"</b> (เคลียร์ NEEDS CLARIFICATION)</div>
+          </div>
+          <div class="tconn">→</div>
+          <div class="tnode reveal">
+            <div class="src">data-model.md</div>
+            <div class="val">title <b>CHECK(length 1–200)</b></div>
+          </div>
+          <div class="tconn">→</div>
+          <div class="tnode reveal">
+            <div class="src">openapi.yaml</div>
+            <div class="val">title <b>maxLength: 200</b></div>
+          </div>
+          <div class="tconn">→</div>
+          <div class="tnode reveal">
+            <div class="src">tasks.md</div>
+            <div class="val"><b>T007</b> unit test: ยาว &gt;200 → 422</div>
+          </div>
+        </div>
+      </div>
+      <p class="trace-cap"><b>= ทุกบรรทัดโค้ดสาวกลับไปหา requirement ได้</b> — ไม่มีอะไร "โผล่มาเฉย ๆ" ในโค้ด ทุกอย่างมีที่มาจาก spec</p>
+    </div>
+  </section>
+
+  <!-- HUMAN GATE CALLOUT -->
+  <section>
+    <div class="wrap">
+      <div class="human reveal">
+        <span class="ic">จำไว้</span>
+        <p><b>Spec Kit ไม่ได้ทำให้คนหายไป — แต่ย้ายบทบาทคนไปอยู่ที่ "จุดตัดสินใจ"</b> แทนการนั่งพิมพ์โค้ดทุกบรรทัด: เขียนกติกา (constitution), ตอบคำถามที่กำกวม (clarify), และ review PR (implement) นี่คือหลัก <span class="mono">human-as-validator</span> ที่เป็นหัวใจของทุก AI-SDLC framework</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="eyebrow">Files in this demo</span>
+    <p class="note">
+      .specify/memory/<b>constitution.md</b><br>
+      specs/001-todo-task-api/ → <b>spec.md · plan.md · data-model.md · contracts/openapi.yaml · tasks.md</b><br>
+      <br>
+      ที่มา flow: <a href="https://github.com/github/spec-kit">github.com/github/spec-kit</a> · ต่อยอดจากรายงาน AI-SDLC framework convergence
+    </p>
+  </div>
+</footer>
+
+<script type="text/plain" class="rawfile" data-name="constitution.md" data-path=".specify/memory/constitution.md" data-stage="STAGE 1 · /constitution">
+# To-do Task API — Constitution
+
+## Core Principles
+
+### I. API-First & Contract-Driven
+ทุกฟีเจอร์ต้องนิยาม contract (OpenAPI) ก่อนเขียนโค้ด. Endpoint, request/response schema
+และรหัสสถานะต้องถูกระบุใน `contracts/` ก่อน implementation เสมอ. การเปลี่ยน contract
+ที่ breaking ต้องขึ้น version ใหม่.
+
+### II. Test-First (NON-NEGOTIABLE)
+เขียนเทสต์ก่อนโค้ดจริง (TDD). ลำดับบังคับ: เขียนเทสต์ → เทสต์แดง → เขียนโค้ด → เทสต์เขียว.
+ทุก endpoint ต้องมี contract test และ integration test อย่างน้อยหนึ่งชุด. ห้าม merge
+โค้ดที่ไม่มีเทสต์ครอบคลุม.
+
+### III. Simplicity First
+เริ่มจากทางที่ง่ายที่สุดที่ใช้ได้จริง. ห้ามเพิ่ม abstraction (repository, service layer,
+message queue) จนกว่าจะมีเหตุผลที่พิสูจน์ได้. YAGNI เป็นค่าเริ่มต้น.
+
+### IV. Observable & Predictable
+ทุก request ต้อง log แบบ structured (method, path, status, latency).
+Error response ต้องมีรูปแบบเดียวกันทั้งระบบ: { "error": { "code", "message" } }.
+
+### V. Stateless & Portable
+บริการต้อง stateless — state อยู่ใน datastore เท่านั้น. ต้องรันได้ด้วยคำสั่งเดียว
+โดยไม่พึ่ง service ภายนอกตอน dev (ใช้ SQLite/in-memory ได้).
+
+## Quality Gates
+- Lint + format ผ่านก่อน commit
+- เทสต์ทั้งหมดเขียวก่อน merge
+- ไม่มี [NEEDS CLARIFICATION] ค้างใน spec ก่อนขึ้น /plan
+
+## Governance
+Constitution นี้เหนือกว่าแนวปฏิบัติอื่น. การแก้ไขต้องบันทึกเหตุผลและ version.
+ทุก PR/review ต้องยืนยันว่าไม่ขัดกับหลักการข้างต้น.
+
+Version: 1.0.0 | Ratified: 2026-07-12 | Last Amended: 2026-07-12
+</script>
+
+<script type="text/plain" class="rawfile" data-name="spec.md" data-path="specs/001-todo-task-api/spec.md" data-stage="STAGE 2–3 · /specify + /clarify">
+# Feature Specification: To-do Task API
+
+Feature Branch: 001-todo-task-api
+Status: Clarified
+Input: "REST API จัดการ to-do task — สร้าง/อ่าน/แก้/ลบ task, ทำเครื่องหมายเสร็จ, กรองตามสถานะ"
+
+## User Scenarios & Testing (mandatory)
+
+### Primary User Story
+ในฐานะผู้ใช้ ฉันต้องการจดงานที่ต้องทำเป็นรายการ task เพื่อไม่ให้ลืม —
+เพิ่มงานใหม่ ดูรายการทั้งหมด ทำเครื่องหมายว่าเสร็จแล้ว แก้ไขรายละเอียด และลบงานที่ไม่ต้องการ
+
+### Acceptance Scenarios
+1. Given ยังไม่มี task, When สร้าง task ด้วยชื่อ "ซื้อของ", Then คืน task ที่มี id, ชื่อ, สถานะ = ยังไม่เสร็จ
+2. Given มี task อยู่ 3 รายการ, When ขอรายการทั้งหมด, Then คืนครบ 3 รายการ
+3. Given มี task ที่ยังไม่เสร็จ, When ทำเครื่องหมายว่าเสร็จ, Then สถานะเปลี่ยนเป็นเสร็จ + บันทึกเวลาที่เสร็จ
+4. Given มี task ทั้งเสร็จและไม่เสร็จ, When กรองด้วยสถานะ "เสร็จ", Then คืนเฉพาะ task ที่เสร็จ
+5. Given มี task หนึ่งรายการ, When ลบ task นั้น, Then task หายจากรายการและเรียกซ้ำได้ 404
+
+### Edge Cases
+- สร้าง task โดยไม่ใส่ชื่อ → ปฏิเสธพร้อม error ที่บอกสาเหตุ
+- แก้/ลบ task ด้วย id ที่ไม่มีอยู่ → คืน 404
+- ชื่อ task ยาวเกินกำหนด → ปฏิเสธ
+- ทำเครื่องหมายเสร็จซ้ำกับ task ที่เสร็จอยู่แล้ว → คงสถานะเดิม (idempotent)
+
+## Requirements (mandatory)
+
+### Functional Requirements
+- FR-001: ระบบต้องให้สร้าง task ใหม่โดยระบุ "ชื่อ" (บังคับ) และ "รายละเอียด" (ไม่บังคับ)
+- FR-002: ระบบต้องกำหนดสถานะเริ่มต้นของ task ใหม่เป็น "ยังไม่เสร็จ" (pending)
+- FR-003: ระบบต้องคืนรายการ task ทั้งหมด และรองรับการกรองตามสถานะ (pending/done)
+- FR-004: ระบบต้องให้ดู task รายตัวด้วย id
+- FR-005: ระบบต้องให้แก้ไขชื่อและรายละเอียดของ task ที่มีอยู่
+- FR-006: ระบบต้องให้เปลี่ยนสถานะ task เป็น "เสร็จ" และบันทึกเวลาที่เสร็จ
+- FR-007: ระบบต้องให้ลบ task
+- FR-008: ระบบต้องปฏิเสธ input ที่ไม่ถูกต้อง (ชื่อว่าง/ยาวเกิน) พร้อมข้อความอธิบาย
+- FR-009: ชื่อ task ต้องยาวไม่เกิน 200 ตัวอักษร   [เดิม: NEEDS CLARIFICATION → เคลียร์ที่ STAGE 3]
+- FR-010: การเรียง task ในรายการต้องเรียงตามเวลาสร้าง ใหม่สุดก่อน   [เดิม: NEEDS CLARIFICATION → เคลียร์ที่ STAGE 3]
+
+### Key Entities
+- Task: หน่วยงานที่ต้องทำหนึ่งชิ้น
+  - id           — ตัวระบุไม่ซ้ำ
+  - title        — ชื่องาน (บังคับ, ≤200 ตัวอักษร)
+  - description  — รายละเอียด (ไม่บังคับ)
+  - status       — pending | done
+  - created_at   — เวลาที่สร้าง
+  - completed_at — เวลาที่เสร็จ (ว่างถ้ายังไม่เสร็จ)
+
+## 🔎 STAGE 3 — /clarify (บันทึกคำถาม-คำตอบ)
+| # | คำถามที่ระบบถาม            | คำตอบที่เลือก                         |
+|---|---------------------------|--------------------------------------|
+| Q1| ชื่อ task จำกัดความยาวเท่าไร? | 200 ตัวอักษร → เป็น FR-009            |
+| Q2| รายการ task เรียงยังไง?      | เวลาสร้าง ใหม่สุดก่อน → เป็น FR-010    |
+| Q3| ต้องมี auth/หลายผู้ใช้ไหม?    | ยังไม่ต้อง — single-user (Out of Scope)|
+
+### Out of Scope (v1)
+Authentication, multi-user, due date/reminder, tag/หมวดหมู่, pagination
+</script>
+
+<script type="text/plain" class="rawfile" data-name="plan.md" data-path="specs/001-todo-task-api/plan.md" data-stage="STAGE 4 · /plan">
+# Implementation Plan: To-do Task API
+
+Branch: 001-todo-task-api | Spec: spec.md
+
+## Technical Context
+| ด้าน       | เลือกใช้                              |
+|------------|--------------------------------------|
+| Language   | Python 3.12                          |
+| Framework  | FastAPI (async)                      |
+| Storage    | SQLite (ไฟล์เดียว, ไม่ต้องตั้ง server) |
+| Validation | Pydantic v2                          |
+| Testing    | pytest + httpx (TestClient)          |
+| Project    | single (backend API)                 |
+
+## Constitution Check (gate)
+| หลักการ        | ผ่าน? | หมายเหตุ                                        |
+|----------------|-------|------------------------------------------------|
+| I. API-First   | ✅    | สร้าง contracts/openapi.yaml ก่อน implement     |
+| II. Test-First | ✅    | tasks.md บังคับเขียนเทสต์ก่อนโค้ด                 |
+| III. Simplicity| ✅    | ไม่มี repository/service layer, SQL ตรง ๆ 1 module|
+| IV. Observable | ✅    | middleware log + error shape กลาง               |
+| V. Stateless   | ✅    | state อยู่ใน SQLite, รันด้วย uvicorn คำสั่งเดียว  |
+
+→ ผ่านทุกข้อ ไม่มี complexity ที่ต้อง justify → ไปต่อ Phase 1 ได้
+
+## Project Structure
+  src/
+  ├── main.py     # FastAPI app + middleware (logging, error handler)
+  ├── models.py   # Pydantic schemas (TaskCreate, TaskUpdate, TaskOut)
+  ├── db.py       # SQLite connection + init schema
+  └── routes.py   # endpoint handlers
+  tests/
+  ├── contract/   # ตรวจว่า response ตรง OpenAPI
+  ├── integration/# ตรวจ user scenario ครบ 5 ข้อ
+  └── unit/       # validation ราย field
+
+## Phase 0 — Research
+- FastAPI + SQLite: ใช้ sqlite3 มาตรฐาน (พอสำหรับ single-user) → ไม่ต้อง ORM
+- Timestamp: เก็บเป็น ISO-8601 UTC
+- Decision log: ไม่ใช้ SQLAlchemy (ขัดหลัก Simplicity), ไม่ใช้ async DB driver (SQLite เร็วพอ)
+
+## Phase 1 — Design Artifacts (สร้างโดย /plan)
+- ✅ data-model.md         — ตาราง tasks + สถานะทรานสิชัน
+- ✅ contracts/openapi.yaml — 6 endpoints
+- ✅ quickstart.md          — วิธีรัน + curl ตัวอย่าง
+
+## Complexity Tracking
+(ว่าง — ไม่มีการเบี่ยงจากหลักการ)
+</script>
+
+<script type="text/plain" class="rawfile" data-name="data-model.md" data-path="specs/001-todo-task-api/data-model.md" data-stage="STAGE 4 · /plan (Phase 1)">
+# Data Model: To-do Task API
+
+## Entity: Task
+| Field        | Type    | Constraint                            | มาจาก          |
+|--------------|---------|---------------------------------------|----------------|
+| id           | INTEGER | PK, autoincrement                     | —              |
+| title        | TEXT    | NOT NULL, len 1–200                   | FR-001, FR-009 |
+| description  | TEXT    | nullable                              | FR-001         |
+| status       | TEXT    | pending | done, default pending      | FR-002         |
+| created_at   | TEXT    | ISO-8601 UTC, NOT NULL                | FR-010         |
+| completed_at | TEXT    | ISO-8601 UTC, nullable                | FR-006         |
+
+## State Transitions
+  [create] ──▶ pending ──[mark done]──▶ done
+                   ▲                       │
+                   └───(idempotent: done→done คงเดิม)
+
+- pending → done : set completed_at = now()
+- done → done    : no-op (idempotent ตาม edge case)
+
+## Schema (SQLite DDL)
+  CREATE TABLE tasks (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    title        TEXT    NOT NULL CHECK(length(title) BETWEEN 1 AND 200),
+    description  TEXT,
+    status       TEXT    NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','done')),
+    created_at   TEXT    NOT NULL,
+    completed_at TEXT
+  );
+  CREATE INDEX idx_tasks_status ON tasks(status);
+</script>
+
+<script type="text/plain" class="rawfile" data-name="openapi.yaml" data-path="specs/001-todo-task-api/contracts/openapi.yaml" data-stage="STAGE 4 · /plan (Phase 1)">
+# API contract จาก /plan (สร้างก่อน implement ตามหลัก I. API-First)
+openapi: 3.1.0
+info:
+  title: To-do Task API
+  version: 1.0.0
+paths:
+  /tasks:
+    get:      # รายการ task (กรองด้วย status ได้) — FR-003, FR-010
+      parameters:
+        - name: status
+          in: query
+          schema: { enum: [pending, done] }
+      responses:
+        "200": { description: OK }
+    post:     # สร้าง task — FR-001, FR-002
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TaskCreate" }
+      responses:
+        "201": { description: Created }
+        "422": { description: Validation error — FR-008 }
+  /tasks/{id}:
+    get:      # ดู task รายตัว — FR-004
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+    patch:    # แก้ title/description — FR-005
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+    delete:   # ลบ task — FR-007
+      responses: { "204": { description: Deleted }, "404": { description: Not found } }
+  /tasks/{id}/complete:
+    post:     # ทำเครื่องหมายเสร็จ (idempotent) — FR-006
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+components:
+  schemas:
+    TaskCreate:
+      type: object
+      required: [title]
+      properties:
+        title:       { type: string, minLength: 1, maxLength: 200 }   # ← FR-009
+        description: { type: string, nullable: true }
+    Task:
+      type: object
+      properties:
+        id:           { type: integer }
+        title:        { type: string }
+        description:  { type: string, nullable: true }
+        status:       { type: string, enum: [pending, done] }
+        created_at:   { type: string, format: date-time }
+        completed_at: { type: string, format: date-time, nullable: true }
+</script>
+
+<script type="text/plain" class="rawfile" data-name="tasks.md" data-path="specs/001-todo-task-api/tasks.md" data-stage="STAGE 5 · /tasks">
+# Tasks: To-do Task API
+
+Legend: [P] = ทำขนานกันได้ (คนละไฟล์ ไม่พึ่งกัน) · เรียงตามลำดับที่ต้องทำ
+
+## Phase A — Setup
+- [ ] T001  สร้างโครง src/, tests/ + pyproject.toml (FastAPI, pydantic, pytest, httpx)
+- [ ] T002  src/db.py — เปิด SQLite + สร้างตารางจาก DDL ใน data-model.md
+
+## Phase B — Tests First (ต้องแดงก่อน ⛔ ห้ามเขียนโค้ดจริงในเฟสนี้)
+- [ ] T003 [P]  contract test POST /tasks → ตรงกับ openapi (201 + schema Task)
+- [ ] T004 [P]  contract test GET /tasks + กรอง ?status=
+- [ ] T005 [P]  contract test POST /tasks/{id}/complete (idempotent)
+- [ ] T006 [P]  integration test scenario #1–#5 จาก spec.md
+- [ ] T007 [P]  unit test validation: title ว่าง / ยาว > 200 → 422 (FR-008/009)
+
+## Phase C — Core Implementation (ทำให้เทสต์ Phase B เขียว)
+- [ ] T008  src/models.py — Pydantic TaskCreate, TaskUpdate, TaskOut
+- [ ] T009  src/routes.py — POST /tasks, GET /tasks (+filter, เรียงใหม่สุดก่อน)
+- [ ] T010  src/routes.py — GET/PATCH/DELETE /tasks/{id} (404 เมื่อไม่พบ)
+- [ ] T011  src/routes.py — POST /tasks/{id}/complete (set completed_at, idempotent)
+
+## Phase D — Integration
+- [ ] T012  src/main.py — middleware log (method/path/status/latency) ตามหลัก IV
+- [ ] T013  error handler กลาง → รูปแบบ { "error": { code, message } }
+
+## Phase E — Polish
+- [ ] T014 [P]  quickstart.md — วิธีรัน + curl ตัวอย่าง
+- [ ] T015 [P]  lint/format + ยืนยันเทสต์เขียวทั้งหมด (quality gate)
+
+## Dependency Notes
+  T001 → T002 → (T003..T007 ขนานกัน) → (T008..T011) → T012/T013 → T014/T015
+          setup      TEST-FIRST 🔴          CORE 🟢        integrate     polish
+
+- Phase C เริ่มได้ต่อเมื่อ Phase B แดงครบ (บังคับโดย constitution II)
+- งานที่ [P] อยู่คนละไฟล์ → แยกทำพร้อมกันได้
+</script>
+
+<script type="text/plain" class="rawfile" data-name="db.py" data-path="src/db.py" data-stage="STAGE 6 · /implement">
+# T002 — SQLite connection + init schema (DDL มาจาก data-model.md)
+import sqlite3
+from pathlib import Path
+
+DB_PATH = Path("tasks.db")
+
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS tasks (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  title        TEXT    NOT NULL CHECK(length(title) BETWEEN 1 AND 200),
+  description  TEXT,
+  status       TEXT    NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','done')),
+  created_at   TEXT    NOT NULL,
+  completed_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
+"""
+
+
+def get_conn():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_db():
+    with get_conn() as conn:
+        conn.executescript(SCHEMA)
+</script>
+
+<script type="text/plain" class="rawfile" data-name="models.py" data-path="src/models.py" data-stage="STAGE 6 · /implement">
+# T008 — Pydantic schemas (ตรงกับ contracts/openapi.yaml)
+from typing import Optional, Literal
+from pydantic import BaseModel, Field
+
+
+class TaskCreate(BaseModel):
+    title: str = Field(min_length=1, max_length=200)   # FR-001, FR-009
+    description: Optional[str] = None
+
+
+class TaskUpdate(BaseModel):                            # FR-005
+    title: Optional[str] = Field(default=None, min_length=1, max_length=200)
+    description: Optional[str] = None
+
+
+class TaskOut(BaseModel):
+    id: int
+    title: str
+    description: Optional[str]
+    status: Literal["pending", "done"]
+    created_at: str
+    completed_at: Optional[str]
+</script>
+
+<script type="text/plain" class="rawfile" data-name="routes.py" data-path="src/routes.py" data-stage="STAGE 6 · /implement">
+# T009–T011 — endpoint handlers (6 ตัวตาม openapi.yaml)
+from datetime import datetime, timezone
+from fastapi import APIRouter, HTTPException, Query
+from .db import get_conn
+from .models import TaskCreate, TaskUpdate, TaskOut
+
+router = APIRouter()
+
+
+def _now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _row(r) -> TaskOut:
+    return TaskOut(**dict(r))
+
+
+@router.post("/tasks", status_code=201, response_model=TaskOut)   # FR-001, FR-002
+def create_task(body: TaskCreate):
+    with get_conn() as conn:
+        cur = conn.execute(
+            "INSERT INTO tasks(title, description, status, created_at) VALUES (?,?,'pending',?)",
+            (body.title, body.description, _now()),
+        )
+        r = conn.execute("SELECT * FROM tasks WHERE id=?", (cur.lastrowid,)).fetchone()
+    return _row(r)
+
+
+@router.get("/tasks", response_model=list[TaskOut])               # FR-003, FR-010
+def list_tasks(status: str | None = Query(default=None, pattern="^(pending|done)$")):
+    q, args = "SELECT * FROM tasks", ()
+    if status:
+        q += " WHERE status=?"
+        args = (status,)
+    q += " ORDER BY created_at DESC, id DESC"                     # ใหม่สุดก่อน
+    with get_conn() as conn:
+        rows = conn.execute(q, args).fetchall()
+    return [_row(r) for r in rows]
+
+
+@router.get("/tasks/{task_id}", response_model=TaskOut)           # FR-004
+def get_task(task_id: int):
+    with get_conn() as conn:
+        r = conn.execute("SELECT * FROM tasks WHERE id=?", (task_id,)).fetchone()
+    if r is None:
+        raise HTTPException(404, "task not found")
+    return _row(r)
+
+
+@router.patch("/tasks/{task_id}", response_model=TaskOut)         # FR-005
+def update_task(task_id: int, body: TaskUpdate):
+    with get_conn() as conn:
+        r = conn.execute("SELECT * FROM tasks WHERE id=?", (task_id,)).fetchone()
+        if r is None:
+            raise HTTPException(404, "task not found")
+        title = body.title if body.title is not None else r["title"]
+        desc = body.description if body.description is not None else r["description"]
+        conn.execute("UPDATE tasks SET title=?, description=? WHERE id=?", (title, desc, task_id))
+        r = conn.execute("SELECT * FROM tasks WHERE id=?", (task_id,)).fetchone()
+    return _row(r)
+
+
+@router.delete("/tasks/{task_id}", status_code=204)               # FR-007
+def delete_task(task_id: int):
+    with get_conn() as conn:
+        cur = conn.execute("DELETE FROM tasks WHERE id=?", (task_id,))
+        if cur.rowcount == 0:
+            raise HTTPException(404, "task not found")
+
+
+@router.post("/tasks/{task_id}/complete", response_model=TaskOut)  # FR-006
+def complete_task(task_id: int):
+    with get_conn() as conn:
+        r = conn.execute("SELECT * FROM tasks WHERE id=?", (task_id,)).fetchone()
+        if r is None:
+            raise HTTPException(404, "task not found")
+        if r["status"] != "done":                                 # idempotent (edge case)
+            conn.execute(
+                "UPDATE tasks SET status='done', completed_at=? WHERE id=?",
+                (_now(), task_id),
+            )
+            r = conn.execute("SELECT * FROM tasks WHERE id=?", (task_id,)).fetchone()
+    return _row(r)
+</script>
+
+<script type="text/plain" class="rawfile" data-name="main.py" data-path="src/main.py" data-stage="STAGE 6 · /implement">
+# T012–T013 — FastAPI app + middleware (Observable) + error handler กลาง
+import time
+import logging
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from .db import init_db
+from .routes import router
+
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+log = logging.getLogger("todo")
+
+app = FastAPI(title="To-do Task API", version="1.0.0")
+
+
+@app.on_event("startup")
+def _startup():
+    init_db()
+
+
+@app.middleware("http")                       # หลัก IV. Observable
+async def log_requests(request: Request, call_next):
+    start = time.perf_counter()
+    response = await call_next(request)
+    ms = (time.perf_counter() - start) * 1000
+    log.info(
+        '{"method":"%s","path":"%s","status":%d,"ms":%.1f}',
+        request.method, request.url.path, response.status_code, ms,
+    )
+    return response
+
+
+def _error(status: int, code: str, message: str):    # error shape กลาง
+    return JSONResponse(status_code=status, content={"error": {"code": code, "message": message}})
+
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exc(request, exc):
+    return _error(exc.status_code, "http_error", str(exc.detail))
+
+
+@app.exception_handler(RequestValidationError)       # FR-008
+async def validation_exc(request, exc):
+    return _error(422, "validation_error", "invalid input")
+
+
+app.include_router(router)
+
+# รัน: uvicorn src.main:app --reload
+</script>
+
+<script type="text/plain" class="rawfile" data-name="test_tasks.py" data-path="tests/test_tasks.py" data-stage="STAGE 6 · /implement (TDD 🔴 ก่อน)">
+# T003–T007 — contract/integration/unit tests (ครอบ acceptance scenario ทั้ง 5 + FR-008/009)
+# หมายเหตุ TDD: ไฟล์นี้ถูกเขียน "ก่อน" โค้ดใน src/ ตาม constitution II
+from fastapi.testclient import TestClient
+from src.main import app
+
+client = TestClient(app)
+
+
+def test_create_defaults_to_pending():          # scenario #1 · FR-002
+    r = client.post("/tasks", json={"title": "ซื้อของ"})
+    assert r.status_code == 201
+    body = r.json()
+    assert body["status"] == "pending"
+    assert body["completed_at"] is None
+
+
+def test_list_returns_all():                     # scenario #2 · FR-003
+    for t in ["a", "b", "c"]:
+        client.post("/tasks", json={"title": t})
+    r = client.get("/tasks")
+    assert r.status_code == 200
+    assert len(r.json()) >= 3
+
+
+def test_complete_is_idempotent():               # scenario #3 · FR-006 · edge case
+    tid = client.post("/tasks", json={"title": "x"}).json()["id"]
+    first = client.post(f"/tasks/{tid}/complete").json()
+    assert first["status"] == "done" and first["completed_at"]
+    second = client.post(f"/tasks/{tid}/complete").json()
+    assert second["completed_at"] == first["completed_at"]   # ทำซ้ำแล้วไม่เปลี่ยน
+
+
+def test_filter_by_status_done():                # scenario #4 · FR-003
+    r = client.get("/tasks", params={"status": "done"})
+    assert r.status_code == 200
+    assert all(t["status"] == "done" for t in r.json())
+
+
+def test_delete_then_404():                      # scenario #5 · FR-007
+    tid = client.post("/tasks", json={"title": "y"}).json()["id"]
+    assert client.delete(f"/tasks/{tid}").status_code == 204
+    assert client.get(f"/tasks/{tid}").status_code == 404
+
+
+def test_title_too_long_returns_422():           # FR-008/009 · T007
+    r = client.post("/tasks", json={"title": "a" * 201})
+    assert r.status_code == 422
+    assert r.json()["error"]["code"] == "validation_error"
+</script>
+
+<script>
+  (function(){
+    var raws = Array.prototype.slice.call(document.querySelectorAll('.rawfile'));
+    var tablist = document.querySelector('.filetabs');
+    var out = document.getElementById('codeout');
+    var fname = document.querySelector('.codebar .fname');
+    var stag = document.querySelector('.codebar .stage-tag');
+    if(!raws.length || !tablist) return;
+    var tabs = [];
+    function select(i){
+      out.textContent = raws[i].textContent.replace(/^\s+|\s+$/g,'');
+      fname.textContent = raws[i].getAttribute('data-path');
+      stag.textContent = raws[i].getAttribute('data-stage');
+      tabs.forEach(function(t,j){ t.setAttribute('aria-selected', j===i ? 'true':'false'); t.tabIndex = j===i?0:-1; });
+    }
+    raws.forEach(function(r,i){
+      var b = document.createElement('button');
+      b.className = 'ftab';
+      b.type = 'button';
+      b.setAttribute('role','tab');
+      b.textContent = r.getAttribute('data-name');
+      b.addEventListener('click', function(){ select(i); });
+      b.addEventListener('keydown', function(e){
+        if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
+          e.preventDefault();
+          var n = (i + (e.key==='ArrowRight'?1:raws.length-1)) % raws.length;
+          tabs[n].focus(); select(n);
+        }
+      });
+      tablist.appendChild(b);
+      tabs.push(b);
+    });
+    select(0);
+  })();
+</script>

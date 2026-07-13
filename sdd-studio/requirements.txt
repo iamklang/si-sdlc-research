@@ -1,0 +1,8 @@
+fastapi>=0.110
+uvicorn[standard]>=0.27
+pydantic>=2
+# สำหรับรันเทสต์ที่ /implement generate
+pytest>=8
+httpx>=0.27
+# optional — เฉพาะ engine=claude (โหมด AI จริง)
+anthropic>=0.40

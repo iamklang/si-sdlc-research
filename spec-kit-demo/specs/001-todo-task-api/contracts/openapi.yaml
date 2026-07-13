@@ -1,0 +1,58 @@
+# STAGE 4 (Phase 1) — API contract จาก /plan (สร้างก่อน implement ตามหลัก I)
+openapi: 3.1.0
+info:
+  title: To-do Task API
+  version: 1.0.0
+paths:
+  /tasks:
+    get:
+      summary: รายการ task (กรองด้วย status ได้) — FR-003, FR-010
+      parameters:
+        - { name: status, in: query, schema: { enum: [pending, done] } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Task" } } } } }
+    post:
+      summary: สร้าง task — FR-001, FR-002
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: "#/components/schemas/TaskCreate" } } }
+      responses:
+        "201": { description: Created, content: { application/json: { schema: { $ref: "#/components/schemas/Task" } } } }
+        "422": { description: Validation error — FR-008 }
+  /tasks/{id}:
+    get:
+      summary: ดู task รายตัว — FR-004
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+    patch:
+      summary: แก้ไข title/description — FR-005
+      responses: { "200": { description: OK }, "404": { description: Not found }, "422": { description: Invalid } }
+    delete:
+      summary: ลบ task — FR-007
+      responses: { "204": { description: Deleted }, "404": { description: Not found } }
+  /tasks/{id}/complete:
+    post:
+      summary: ทำเครื่องหมายเสร็จ (idempotent) — FR-006
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+components:
+  schemas:
+    TaskCreate:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 200 }
+        description: { type: string, nullable: true }
+    Task:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        status: { type: string, enum: [pending, done] }
+        created_at: { type: string, format: date-time }
+        completed_at: { type: string, format: date-time, nullable: true }
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties: { code: { type: string }, message: { type: string } }
